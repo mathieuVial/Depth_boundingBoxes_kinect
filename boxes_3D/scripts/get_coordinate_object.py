@@ -51,9 +51,13 @@ class GetCenterCoordinates(object):
         rospy.Subscriber(self.topic_image, Image, self.callback_image)
 
     def callback_image_depth(self,data):
+        if len(data.data)<=0:
+            rospy.logwarn("depth image from camera null")
         self.image_depth=data
 
     def callback_image(self,data):
+        if len(data.data)<=0:
+            rospy.logwarn("image rgb from camera null")
         self.image=data
 
     def handle_bbox_req(self,req):
@@ -67,28 +71,44 @@ class GetCenterCoordinates(object):
         
         model_name = req.model_name
         classes = req.classes
-        if req.depth is not None:
+        if len(req.depth.data)>0:
+            rospy.loginfo("service called without depth_image")
             self.depth_msg=req.depth
         else:
-            rospy.loginfo("service called without depth_image")
-
             self.depth_msg =  self.image_depth
-        image = req.image
+        
 
 
-        if req.image is not None:
-            
+        if len(req.image.data)>0 :
+            rospy.loginfo("service called without rgb_image")
             self.image_msg=req.image
         else:
             self.image_msg =  self.image
-            rospy.loginfo("service called without depth_image")
         # rospy.loginfo("en attente du cul")
-        #TODO add timeout and display warning
+
         rospy.wait_for_service('yolov8_on_unique_frame')
         try:
             # rospy.loginfo("service du cul activé")
             yolov8_cli=rospy.ServiceProxy('yolov8_on_unique_frame', Yolov8)
             resp=yolov8_cli(model_name,classes,self.image_msg).boxes
+            # rospy.loginfo(len(resp))
+            list_score=[]
+            list_label=[]
+            list_height=[]
+            list_width=[]
+            list_id=[]
+            for bbox in resp:
+                # rospy.loginfo("les couilles")
+
+                list_score.append(bbox.probability)
+                list_label.append(bbox.bbox_class)
+                center=[bbox.ymax-(bbox.ymax-bbox.ymin)/2,bbox.xmax-(bbox.xmax-bbox.xmin)/2]
+                list_height.append(center[0])
+                list_width.append(center[1])
+                list_id.append(bbox.ID)
+                
+
+            returned_boxes=boxes3D()
             returned_boxes=[]
             # rospy.loginfo(len(returned_boxes))
 
@@ -103,14 +123,14 @@ class GetCenterCoordinates(object):
                 box.xmax=bbox.xmax
                 box.ymax=bbox.ymax
                 # rospy.loginfo(center)
-                box.centerz=self.get_centers_coordinates([bbox.ymax-(bbox.ymax-bbox.ymin)/2,bbox.xmax-(bbox.xmax-bbox.xmin)/2])
+                box.centerz=self.get_centers_coordinates(center)
                 # rospy.loginfo(box.centerz)
                 
                 box.skeleton=bbox.skeleton
                 # rospy.loginfo(box)
                 returned_boxes.append(box)
-                # rospy.loginfo(str(returned_boxes))           
-            # rospy.loginfo(returned_boxes)
+                rospy.loginfo(str(returned_boxes))           
+            rospy.loginfo(returned_boxes)
             return(boxes3DResponse(returned_boxes))
 
 
@@ -128,9 +148,9 @@ class GetCenterCoordinates(object):
         
 
         depth_array=self.bridge.imgmsg_to_cv2(self.depth_msg,"16UC1")
-        # rospy.loginfo(depth_array.shape)
-        depth=depth_array[int(center[0])][int(center[1])]/1000
-        # rospy.loginfo(depth)
+        rospy.loginfo(depth_array.shape)
+        depth=depth_array[int(center[0])][int(center[1])]
+        rospy.loginfo(depth)
         if depth==0:
             depth=-1
         return depth
