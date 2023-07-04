@@ -1,0 +1,9 @@
+uint16 ID
+string bbox_class
+float64 probability
+float64 xmin
+float64 ymin
+float64 xmax
+float64 ymax
+float64 centerz
+geometry_msgs/Point[] skeleton
