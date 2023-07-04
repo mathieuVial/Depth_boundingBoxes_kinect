@@ -39,8 +39,22 @@ class GetCenterCoordinates(object):
         self.depth_msg=Image()
         self.rate=rospy.Rate(30)
         self.center_coordinates=None
+        self.topic_image= rospy.get_param("/topic_image","/kinect2/hd/image_color")
+        self.topic_depth= rospy.get_param("/topic_depth","/kinect2/hd/image_depth_rect")
+
         self.boxes_src = rospy.Service('boxes_3d_service', boxes3D, self.handle_bbox_req)
-    
+        rospy.loginfo("subscribed to"+" "+str(self.topic_depth))
+        rospy.loginfo("subscribed to"+" "+str(self.topic_image))
+
+
+        rospy.Subscriber(self.topic_depth, Image, self.callback_image_depth)
+        rospy.Subscriber(self.topic_image, Image, self.callback_image)
+
+    def callback_image_depth(self,data):
+        self.image_depth=data
+
+    def callback_image(self,data):
+        self.image=data
 
     def handle_bbox_req(self,req):
         """
@@ -50,17 +64,29 @@ class GetCenterCoordinates(object):
         """
         
 
-        image = req.image
+        
         model_name = req.model_name
         classes = req.classes
-        self.depth_msg=req.depth
+        if req.depth is not None:
+            rospy.loginfo("service called without depth_image")
+            self.depth_msg=req.depth
+        else:
+            self.depth_msg =  self.image_depth
+        image = req.image
+
+
+        if req.image is not None:
+            rospy.loginfo("service called without depth_image")
+            self.image_msg=req.image
+        else:
+            self.image_msg =  self.image
         # rospy.loginfo("en attente du cul")
 
         rospy.wait_for_service('yolov8_on_unique_frame')
         try:
             # rospy.loginfo("service du cul activé")
             yolov8_cli=rospy.ServiceProxy('yolov8_on_unique_frame', Yolov8)
-            resp=yolov8_cli(model_name,classes,image).boxes
+            resp=yolov8_cli(model_name,classes,self.image_msg).boxes
             # rospy.loginfo(len(resp))
             list_score=[]
             list_label=[]
@@ -99,7 +125,7 @@ class GetCenterCoordinates(object):
                 box.skeleton=bbox.skeleton
                 # rospy.loginfo(box)
                 returned_boxes.append(box)
-                # rospy.loginfo(str(returned_boxes))           
+                rospy.loginfo(str(returned_boxes))           
             rospy.loginfo(returned_boxes)
             return(boxes3DResponse(returned_boxes))
 
@@ -107,10 +133,6 @@ class GetCenterCoordinates(object):
 
         except:
             pass
-
-
-
-
 
     def get_centers_coordinates(self,center):
         """
@@ -120,7 +142,6 @@ class GetCenterCoordinates(object):
         Will publish a custom message with a table containing each point XYZ with its label
         """
         
-        rospy.loginfo(type(self.depth_msg))
 
         depth_array=self.bridge.imgmsg_to_cv2(self.depth_msg,"16UC1")
         rospy.loginfo(depth_array.shape)
@@ -129,7 +150,9 @@ class GetCenterCoordinates(object):
         if depth==0:
             depth=-1
         return depth
+    
 if __name__=="__main__":
-    a=GetCenterCoordinates()
-    while not rospy.is_shutdown():
-        a.rate.sleep()
+    if __name__ == '__main__':
+        a=GetCenterCoordinates()
+        while not rospy.is_shutdown():
+            a.rate.sleep()
