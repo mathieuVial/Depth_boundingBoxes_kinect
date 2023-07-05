@@ -88,11 +88,9 @@ class GetCenterCoordinates(object):
             self.image_msg=req.image
         else:
             self.image_msg =  self.image
-        # rospy.loginfo("en attente du cul")
 
         rospy.wait_for_service('yolov8_on_unique_frame')
         try:
-            # rospy.loginfo("service du cul activé")
             yolov8_cli=rospy.ServiceProxy('yolov8_on_unique_frame', Yolov8)
             resp=yolov8_cli(model_name,classes,self.image_msg).boxes
             # rospy.loginfo(len(resp))
@@ -102,7 +100,6 @@ class GetCenterCoordinates(object):
             # rospy.loginfo(len(returned_boxes))
 
             for bbox in resp:
-                # rospy.loginfo("labite")
                 box=Box3D_pose()
                 box.ID=bbox.ID
                 box.bbox_class=bbox.bbox_class
