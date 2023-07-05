@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 """
 This code gets a ROS message with bounding boxes coordinates for each object detected
@@ -57,14 +57,12 @@ class GetCenterCoordinates(object):
     def callback_image_depth(self,data):
         if len(data.data)<=0:
             rospy.logwarn("depth image from camera null")
-        else:
-            self.image_depth=data
+        self.image_depth=data
 
     def callback_image(self,data):
         if len(data.data)<=0:
             rospy.logwarn("image rgb from camera null")
-        else:
-            self.image=data
+        self.image=data
 
     def handle_bbox_req(self,req):
         """
@@ -150,7 +148,7 @@ class GetCenterCoordinates(object):
             rospy.loginfo(pose)
             return pose
         else :
-            depth=(depth-100.0)/1000.0
+            depth=depth/1000.0
             x_real,y_real=self.getRealXY(centerx,centery,depth,self.image_msg.width,self.image_msg.height)
             pose.header.stamp = rospy.Time.now()
             pose.header.frame_id = self.image_msg.header.frame_id  # Frame de référence global

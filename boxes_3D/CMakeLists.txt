@@ -54,8 +54,6 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-   Box3D.msg
-   Boxes3D.msg
    Box3D_pose.msg
    Boxes3D_pose.msg  
  )
@@ -64,8 +62,6 @@ add_message_files(
  add_service_files(
    FILES
    boxes3D.srv
-   boxes3D_pose.srv
-
  )
 
 ## Generate actions in the 'action' folder

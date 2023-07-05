@@ -1,6 +1,0 @@
-string model_name
-uint8[] classes #if empty, all classes are tracked
-sensor_msgs/Image image
-sensor_msgs/Image depth
----
-Box3D_pose[] boxes3D_pose
