@@ -146,11 +146,14 @@ class GetCenterCoordinates(object):
             depth=-1
         if depth==-1:
             rospy.loginfo(pose)
+            pose.header.stamp = rospy.Time.now()
+            pose.header.frame_id=self.image_msg.header.frame_id
             return pose
         else :
             depth=depth/1000.0
             x_real,y_real=self.getRealXY(centerx,centery,depth,self.image_msg.width,self.image_msg.height)
             pose.header.stamp = rospy.Time.now()
+            rospy.loginfo(self.image_msg.header.frame_id)
             pose.header.frame_id = self.image_msg.header.frame_id  # Frame de référence global
             # pose.child_frame_id = "OBJ_" + label + '_link' # Frame de l'objet détecté 
             pose.pose.position.x = depth
