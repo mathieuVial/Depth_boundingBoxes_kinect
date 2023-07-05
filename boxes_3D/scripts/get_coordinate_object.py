@@ -28,6 +28,7 @@ from boxes_3D.msg import Box3D_pose
 from boxes_3D.msg import Boxes3D_pose
 # from tf_broadcaster.msg import DetectionCoordinates, PointCoordinates
 from nav_msgs.msg import Odometry
+from statistics import mean
 
 
 class GetCenterCoordinates(object):
@@ -88,9 +89,11 @@ class GetCenterCoordinates(object):
             self.image_msg=req.image
         else:
             self.image_msg =  self.image
+        # rospy.loginfo("en attente du cul")
 
         rospy.wait_for_service('yolov8_on_unique_frame')
         try:
+            # rospy.loginfo("service du cul activé")
             yolov8_cli=rospy.ServiceProxy('yolov8_on_unique_frame', Yolov8)
             resp=yolov8_cli(model_name,classes,self.image_msg).boxes
             # rospy.loginfo(len(resp))
@@ -100,6 +103,7 @@ class GetCenterCoordinates(object):
             # rospy.loginfo(len(returned_boxes))
 
             for bbox in resp:
+                # rospy.loginfo("labite")
                 box=Box3D_pose()
                 box.ID=bbox.ID
                 box.bbox_class=bbox.bbox_class
@@ -137,8 +141,27 @@ class GetCenterCoordinates(object):
         pose=PoseStamped()
         depth_array=self.bridge.imgmsg_to_cv2(self.depth_msg,"16UC1")
         rospy.loginfo(depth_array.shape)
-        depth=depth_array[int(centerz[0])][int(centerz[1])]
+
+        depth_up=int(depth_array[int(centerz[0])+1][int(centerz[1])])
+        depth_up_right=int(depth_array[int(centerz[0]+1)][int(centerz[1])+1])
+        depth_up_left=int(depth_array[int(centerz[0])+1][int(centerz[1])-1])
+        
+        depth_down=int(depth_array[int(centerz[0])-1][int(centerz[1])])
+        depth_down_right=int(depth_array[int(centerz[0])-1][int(centerz[1])+1])
+        depth_down_left=int(depth_array[int(centerz[0])-1][int(centerz[1])-1])
+
+        depth_rigth=int(depth_array[int(centerz[0])][int(centerz[1])+1])
+        depth_left=int(depth_array[int(centerz[0])][int(centerz[1])-1])
+        
+        depth_center=int(depth_array[int(centerz[0])][int(centerz[1])])
+        list_depth=[depth_up,depth_up_right,depth_up_left,depth_down,depth_down_right,depth_down_left,depth_rigth,depth_left,depth_center]
+        rospy.loginfo(len(list_depth))
+        list_depth = [x for x in list_depth if x != 0]
+        if len(list_depth)==0:
+            list_depth=[0]
+        depth=mean(list_depth)
         rospy.loginfo(depth)
+
         if depth==0:
             depth=-1
         if depth==-1:
