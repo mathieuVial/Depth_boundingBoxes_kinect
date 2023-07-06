@@ -41,5 +41,5 @@ if __name__=="__main__":
         a.test()
         while not rospy.is_shutdown():
             a.test()
-            rospy.sleep(1)
+            rospy.sleep(0.25)
         

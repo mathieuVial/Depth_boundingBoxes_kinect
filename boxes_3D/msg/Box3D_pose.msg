@@ -6,4 +6,4 @@ float64 ymin
 float64 xmax
 float64 ymax
 geometry_msgs/PoseStamped pose
-geometry_msgs/Point[] skeleton
+yolov8_ros/SkeletonPoint[] skeleton

@@ -77,17 +77,19 @@ class GetCenterCoordinates(object):
         model_name = req.model_name
         classes = req.classes
         if len(req.depth.data)>0:
-            rospy.loginfo("service called without depth_image")
+            
             self.depth_msg=req.depth
         else:
+            rospy.loginfo("service called without depth_image")
             self.depth_msg =  self.image_depth
         
 
 
         if len(req.image.data)>0 :
-            rospy.loginfo("service called without rgb_image")
+            
             self.image_msg=req.image
         else:
+            rospy.loginfo("service called without rgb_image")
             self.image_msg =  self.image
         # rospy.loginfo("en attente du cul")
 
