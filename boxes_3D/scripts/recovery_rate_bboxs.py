@@ -132,7 +132,7 @@ class Get_Recovery_rate(object):
                 self.cv2_pub.publish((self.bridge.cv2_to_imgmsg(cv_image,
                                                                encoding=self.image.encoding)))
                 client=scp.client(host="10.68.0.1",user="pal",password="")
-                client.transfert('/tmp/image_luggage.jpg')
+                client.transfert('/tmp/suitcase.jpg','/home/robocup/Bureau/robocup_2023/ros_ws/src/ros_hri_manager/public_data/hri/suitcase.jpg')
                 return(boxes3DResponse([box_to_carry]))
 
 
