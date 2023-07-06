@@ -56,7 +56,7 @@ class Get_Recovery_rate(object):
                 rospy.loginfo("Attente du service boxes 3D")
 
                 get_boxes_espace = rospy.ServiceProxy('boxes_3d_service',boxes3D)
-                bbox_espace_suitcases = get_boxes_espace("",[56],Image(),Image()).boxes3D_pose
+                bbox_espace_suitcases = get_boxes_espace("",[28],Image(),Image()).boxes3D_pose
                 bbox_espace_people = get_boxes_espace("yolov8m-pose.pt",[0],Image(),Image()).boxes3D_pose
                 self.list_coord_case=[]
 
@@ -128,10 +128,11 @@ class Get_Recovery_rate(object):
                 cv_image = self.bridge.imgmsg_to_cv2(self.image)
                 cv2.rectangle(cv_image, min_pt, max_pt, color = (0,255,0), thickness=10)
             
-                
+                cv2.imwrite('/tmp/image_luggage.jpg', cv_image)
                 self.cv2_pub.publish((self.bridge.cv2_to_imgmsg(cv_image,
                                                                encoding=self.image.encoding)))
-                
+                client=scp.client(host="10.68.0.1",user="pal",password="")
+                client.transfert('/tmp/image_luggage.jpg')
                 return(boxes3DResponse([box_to_carry]))
 
 
