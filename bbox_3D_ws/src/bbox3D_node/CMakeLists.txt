@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(boxes_3D)
+project(bbox3D_node)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,14 +8,12 @@ project(boxes_3D)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
   rospy
   std_msgs
-  ## vision_msgs
-  sensor_msgs
-  geometry_msgs
-  yolov8_ros
   message_generation
-  
+  bbox3D_srv
+  yolov8_ros_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -52,17 +50,18 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-   Box3D.msg
-   Boxes3D.msg  
- )
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
- add_service_files(
-   FILES
-   boxes3D.srv
- )
+# add_service_files(
+#   FILES
+#   Service1.srv
+#   Service2.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -75,11 +74,9 @@ add_message_files(
  generate_messages(
    DEPENDENCIES
    std_msgs
-   geometry_msgs
-   sensor_msgs
-   yolov8_ros
-   
- )
+   bbox3D_srv
+   yolov8_ros_msgs
+  )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -111,10 +108,10 @@ add_message_files(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- # INCLUDE_DIRS include
- # LIBRARIES boxes_3D
- CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs message_runtime yolov8_ros
- # DEPENDS system_lib
+#  INCLUDE_DIRS include
+#  LIBRARIES bbox3D_node
+#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  DEPENDS system_lib
 )
 
 ###########
@@ -130,7 +127,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/boxes_3D.cpp
+#   src/${PROJECT_NAME}/bbox3D_node.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -141,7 +138,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/boxes_3D_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/bbox3D_node_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -205,7 +202,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_boxes_3D.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_bbox3D_node.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
