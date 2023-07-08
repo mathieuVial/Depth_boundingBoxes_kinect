@@ -14,10 +14,10 @@ from geometry_msgs.msg import PoseStamped, TransformStamped
 from math import pi,sin
 # from darknet_ros_msgs.msg import BoundingBoxes
 from tf.msg import tfMessage
-from boxes_3D.srv import boxes3D, boxes3DResponse
+from bbox3D_msgs.srv import bbox3D_srv, bbox3D_srvResponse
 import scp
 
-from boxes_3D.msg import Box3D_pose
+from bbox3D_msgs.msg import Box3D_pose
 
 
 class Get_Recovery_rate(object):
@@ -31,7 +31,7 @@ class Get_Recovery_rate(object):
         self.depth_msg=Image()
         self.rate=rospy.Rate(30)
         self.center_coordinates=None
-        self.boxes_src = rospy.Service('box_to_carry_service', boxes3D, self.myServiceCallback)
+        self.boxes_src = rospy.Service('box_to_carry_service', bbox3D_srv, self.myServiceCallback)
         self.image = Image()
         self.bridge=CvBridge()
         self.list_coord_case=[]
@@ -55,7 +55,7 @@ class Get_Recovery_rate(object):
 
                 rospy.loginfo("Attente du service boxes 3D")
 
-                get_boxes_espace = rospy.ServiceProxy('boxes_3d_service',boxes3D)
+                get_boxes_espace = rospy.ServiceProxy('boxes_3d_service',bbox3D_srv)
                 bbox_espace_suitcases = get_boxes_espace("",[28],Image(),Image()).boxes3D_pose
                 bbox_espace_people = get_boxes_espace("yolov8m-pose.pt",[0],Image(),Image()).boxes3D_pose
                 self.list_coord_case=[]
@@ -133,7 +133,7 @@ class Get_Recovery_rate(object):
                                                                encoding=self.image.encoding)))
                 client=scp.client(host="10.68.0.1",user="pal",password="")
                 client.transfert('/tmp/suitcase.jpg','/home/robocup/Bureau/robocup_2023/ros_ws/src/ros_hri_manager/public_data/hri/suitcase.jpg')
-                return(boxes3DResponse([box_to_carry]))
+                return(bbox3D_srvResponse([box_to_carry]))
 
 
 

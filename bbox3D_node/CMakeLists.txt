@@ -12,7 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
-  bbox3D_srv
   yolov8_ros_msgs
   bbox3D_msgs
 )
@@ -75,7 +74,6 @@ find_package(catkin REQUIRED COMPONENTS
  generate_messages(
    DEPENDENCIES
    std_msgs
-   bbox3D_srv
    yolov8_ros_msgs
    bbox3D_msgs
   )
