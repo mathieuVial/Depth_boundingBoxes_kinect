@@ -21,11 +21,10 @@ from geometry_msgs.msg import PoseStamped, TransformStamped
 from math import pi,sin
 # from darknet_ros_msgs.msg import BoundingBoxes
 from tf.msg import tfMessage
-from yolov8_ros.srv import Yolov8
-from boxes_3D.srv import boxes3D, boxes3DResponse
+from yolov8_ros_msgs.srv import Yolov8
+from bbox3D_msgs.srv import bbox3D_srv, bbox3D_srvResponse
 # from Boxes.msg import boxes
-from boxes_3D.msg import Box3D_pose
-from boxes_3D.msg import Boxes3D_pose
+from bbox3D_msgs.msg import Box3D_pose
 # from tf_broadcaster.msg import DetectionCoordinates, PointCoordinates
 from nav_msgs.msg import Odometry
 
@@ -44,7 +43,7 @@ class GetCenterCoordinates(object):
         self.topic_image= rospy.get_param("/topic_image","/kinect2/hd/image_color")
         self.topic_depth= rospy.get_param("/topic_depth","/kinect2/hd/image_depth_rect")
 
-        self.boxes_src = rospy.Service('boxes_3d_service', boxes3D, self.handle_bbox_req)
+        self.boxes_src = rospy.Service('boxes_3d_service', bbox3D_srv, self.handle_bbox_req)
         rospy.loginfo("subscribed to"+" "+str(self.topic_depth))
         rospy.loginfo("subscribed to"+" "+str(self.topic_image))
 
@@ -56,12 +55,12 @@ class GetCenterCoordinates(object):
 
     def callback_image_depth(self,data):
         if len(data.data)<=0:
-            rospy.logwarn("depth image from camera null")
+            rospy.logwarn("[bbox3D_node] depth image from camera null")
         self.image_depth=data
 
     def callback_image(self,data):
         if len(data.data)<=0:
-            rospy.logwarn("image rgb from camera null")
+            rospy.logwarn("[bbox3D_node] image rgb from camera null")
         self.image=data
 
     def handle_bbox_req(self,req):
@@ -76,7 +75,7 @@ class GetCenterCoordinates(object):
         model_name = req.model_name
         classes = req.classes
         if len(req.depth.data)>0:
-            rospy.loginfo("service called without depth_image")
+            rospy.loginfo("[bbox3D_node] service called without depth_image")
             self.depth_msg=req.depth
         else:
             self.depth_msg =  self.image_depth
@@ -84,7 +83,7 @@ class GetCenterCoordinates(object):
 
 
         if len(req.image.data)>0 :
-            rospy.loginfo("service called without rgb_image")
+            rospy.loginfo("[bbox3D_node] service called without rgb_image")
             self.image_msg=req.image
         else:
             self.image_msg =  self.image
@@ -118,9 +117,10 @@ class GetCenterCoordinates(object):
                 box.skeleton=bbox.skeleton
                 # rospy.loginfo(box)
                 returned_boxes.append(box)
-                rospy.loginfo(str(returned_boxes))           
-            rospy.loginfo(returned_boxes)
-            return(boxes3DResponse(returned_boxes))
+                rospy.loginfo("[bbox3D_node] Pose sent")
+                # rospy.loginfo(str(returned_boxes))           
+            # rospy.loginfo(returned_boxes)
+            return(bbox3D_srvResponse(returned_boxes))
 
         except:
             pass
@@ -135,13 +135,13 @@ class GetCenterCoordinates(object):
         """
         pose=PoseStamped()
         depth_array=self.bridge.imgmsg_to_cv2(self.depth_msg,"16UC1")
-        rospy.loginfo(depth_array.shape)
+        # rospy.loginfo(depth_array.shape)
         depth=depth_array[int(centerz[0])][int(centerz[1])]
-        rospy.loginfo(depth)
+        # rospy.loginfo(depth)
         if depth==0:
             depth=-1
         if depth==-1:
-            rospy.loginfo(pose)
+            # rospy.loginfo(pose)
             pose.header.stamp = rospy.Time.now()
             pose.header.frame_id=self.image_msg.header.frame_id
             return pose

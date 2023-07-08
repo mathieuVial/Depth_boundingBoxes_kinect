@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   bbox3D_srv
   yolov8_ros_msgs
+  bbox3D_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -76,6 +77,7 @@ find_package(catkin REQUIRED COMPONENTS
    std_msgs
    bbox3D_srv
    yolov8_ros_msgs
+   bbox3D_msgs
   )
 
 ################################################

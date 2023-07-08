@@ -69,6 +69,9 @@
   <build_depend>bbox3D_srv</build_depend>
   <exec_depend>bbox3D_srv</exec_depend>
   <build_export_depend>bbox3D_srv</build_export_depend>
+  <build_depend>bbox3D_msgs</build_depend>
+  <exec_depend>bbox3D_msgsv</exec_depend>
+  <build_export_depend>bbox3D_msgs</build_export_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
