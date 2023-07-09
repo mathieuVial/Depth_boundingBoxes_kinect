@@ -51,8 +51,13 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
+<<<<<<< HEAD:bbox3D_msgs/CMakeLists.txt
  add_message_files(
    FILES
+=======
+add_message_files(
+  FILES
+>>>>>>> master:boxes_3D/CMakeLists.txt
    Box3D_pose.msg
    Boxes3D_pose.msg  
  )
